@@ -1,0 +1,100 @@
+```{r}
+dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/543GroupDataSet.csv')
+```
+
+```{r}
+str(dataset)
+```
+```{r}
+dataset$STATE <- as.character(dataset$STATE)
+str(dataset)
+```
+
+```{r}
+library(magrittr)
+sort(unique(dataset$STATE))%>%head(20)
+```
+
+
+```{r, eval=TRUE}
+USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
+```
+
+
+```{r, eval=TRUE}
+library(geojsonio)
+PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
+```
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+```{r}
+library(rmapshaper)
+USzipMap=ms_simplify(USzipMap)
+```
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+```{r, eval=TRUE}
+library(ggplot2)
+ggplot(data=USzipMap) + geom_sf()
+```
+```{r}
+names(USzipMap)
+```
+
+```{r}
+str(USzipMap$STATE_NAME)
+```
+```{r}
+layerUSMap=merge(USzipMap,dataset, 
+                   by.x='STATE_NAME', 
+                   by.y='STATE',
+                   all.x=F) # if no coincidence don't keep shape.
+```
+
+```{r, eval=TRUE,warning=FALSE}
+
+# This will make just a border of the state
+baseMap <- ms_dissolve(USzipMap)
+```
+
+This is the base map, which may help us show the missing shapes.
+```{r, eval=TRUE}
+ggplot(baseMap) + geom_sf()
+```
+
+```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide'}
+library(RColorBrewer)
+library(tmap)
+```
+
+2. Decide the amount of groups:
+
+```{r, eval=TRUE}
+numberOfClasses = 5
+```
+
+3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
+```{r, eval=TRUE}
+colorForScale='YlGnBu' # color scale
+```
+
+
+```{r, eval=TRUE}
+layerUSMap$cut=cut_number(layerUSMap$Happiness,5,
+                            ordered_result=T,
+                            dig.lab=5)
+```
+```{r}
+
+baseLayer=ggplot(data = baseMap) +geom_sf() 
+layer1 = baseLayer + geom_sf(data = layerUSMap, aes(fill=cut),color=NA,show.legend = T) +
+                 scale_fill_brewer(palette = colorForScale,
+                                   name = "Intervals")
+layer1 
+```
+
