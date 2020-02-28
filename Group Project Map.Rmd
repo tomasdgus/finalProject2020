@@ -80,12 +80,12 @@ numberOfClasses = 5
 
 3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
 ```{r, eval=TRUE}
-colorForScale='YlGnBu' # color scale
+colorForScale='BuPu' # color scale
 ```
 
 
 ```{r, eval=TRUE}
-layerUSMap$cut=cut_number(layerUSMap$Happiness,5,
+layerUSMap$cut=cut_number(layerUSMap$Confidence,5,
                             ordered_result=T,
                             dig.lab=5)
 ```
@@ -96,5 +96,9 @@ layer1 = baseLayer + geom_sf(data = layerUSMap, aes(fill=cut),color=NA,show.lege
                  scale_fill_brewer(palette = colorForScale,
                                    name = "Intervals")
 layer1 
+```
+```{r}
+pacific = layer1 + coord_sf(xlim = c(-110,-125),ylim=c(31,50))
+pacific
 ```
 
