@@ -101,16 +101,30 @@ layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=as.factor(RegionNumber
 layer1
 ```
 
+
+```{r}
+pacificx = c(-110,-125)
+pacificy = c(31,50)
+intermountainx =c(-115,-94)
+intermountainy = c(27,50)
+midwestx = c(-104,-81)
+midwesty = c(33,50)
+```
+
 ```{r}
 
 baseLayer2=ggplot(data = baseMap) +geom_sf() 
 layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T) +
                  scale_fill_brewer(palette = colorForScale,
-                                   name = "Intervals")
+                                   name = "Confidence")+theme_classic()
+layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())
 layer2 
 ```
 ```{r}
-pacific = layer2 + coord_sf(xlim = c(-110,-125),ylim=c(31,50))
-pacific
+pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)
+pacific2
 ```
 
