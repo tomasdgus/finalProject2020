@@ -127,4 +127,9 @@ layer2
 pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)
 pacific2
 ```
+```{r}
+histobase = ggplot(data=dataset, aes(x=Region, y=GDPperCapita))
+GDPhisto = histobase + geom_boxplot()
+GDPhisto
+```
 
