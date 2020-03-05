@@ -7,6 +7,7 @@ str(dataset)
 ```
 ```{r}
 dataset$STATE <- as.character(dataset$STATE)
+dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
 str(dataset)
 ```
 
@@ -81,24 +82,35 @@ numberOfClasses = 5
 3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
 ```{r, eval=TRUE}
 colorForScale='BuPu' # color scale
+RegionColor = 'Pastel1'
 ```
 
 
 ```{r, eval=TRUE}
-layerUSMap$cut=cut_number(layerUSMap$Confidence,5,
+layerUSMap1 = layerUSMap
+
+layerUSMap2 = layerUSMap
+layerUSMap2$cut=cut_number(layerUSMap$Confidence,5,
                             ordered_result=T,
                             dig.lab=5)
 ```
 ```{r}
+baseLayer1 = ggplot(data=baseMap) + geom_sf()
+layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=as.factor(RegionNumber)),show.legend = T)+
+    scale_fill_brewer(palette = RegionColor,name="Regions")
+layer1
+```
 
-baseLayer=ggplot(data = baseMap) +geom_sf() 
-layer1 = baseLayer + geom_sf(data = layerUSMap, aes(fill=cut),color=NA,show.legend = T) +
+```{r}
+
+baseLayer2=ggplot(data = baseMap) +geom_sf() 
+layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T) +
                  scale_fill_brewer(palette = colorForScale,
                                    name = "Intervals")
-layer1 
+layer2 
 ```
 ```{r}
-pacific = layer1 + coord_sf(xlim = c(-110,-125),ylim=c(31,50))
+pacific = layer2 + coord_sf(xlim = c(-110,-125),ylim=c(31,50))
 pacific
 ```
 
