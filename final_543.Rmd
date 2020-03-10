@@ -1,0 +1,398 @@
+---
+title: "Final"
+output: html_document
+---
+
+```{r}
+dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/dataset543.csv')
+```
+
+```{r}
+#dataset$STATE <- dataset$ï..STATE
+```
+
+```{r}
+#sorting region by violent crimer per 1000
+library(magrittr)
+dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>%head(20)
+```
+
+```{r}
+aggregate(data=dataset, ViolentCrimeTotal~REGION,mean)
+```
+
+```{r}
+#box plot of regional totals
+base = ggplot(data=dataset,
+              aes(x=REGION, y = ViolentCrimeTotal))
+
+base + geom_boxplot()
+```
+
+```{r}
+aggregate(data=dataset, ViolentCrimeTotal~REGION,summary)
+```
+
+```{r}
+#box plots broken by HS rank bucket
+library(ggpubr)
+base1=ggplot(data=dataset[dataset$HSRankQuartile==1,],
+            aes(x=REGION,y=ViolentCrimePer1000)) 
+box1=base1 + geom_boxplot() + labs(title = "1st Quartile HS Rank")
+
+base2=ggplot(data=dataset[dataset$HSRankQuartile==2,],
+            aes(x=REGION,y=ViolentCrimePer1000))
+box2=base2 + geom_boxplot() + labs(title = "2nd Quartile HS Rank")
+
+base3=ggplot(data=dataset[dataset$HSRankQuartile==3,],
+            aes(x=REGION,y=ViolentCrimePer1000)) 
+box3=base3 + geom_boxplot() + labs(title = "3rd Quartile HS Rank")
+
+
+base4=ggplot(data=dataset[dataset$HSRankQuartile==4,],
+            aes(x=REGION,y=ViolentCrimePer1000)) 
+box4=base4 + geom_boxplot() + labs(title = "4th Quartile HS Rank")
+
+
+
+#all in one:
+ggarrange(box1,box2,box3,box4)
+```
+
+```{r}
+#an attempt to show growing crime rates by hs quartile
+baseall = ggplot(data=dataset,
+                 aes(x=as.factor(HSRankQuartile),
+                     y=ViolentCrimePer1000))
+
+boxall = baseall + geom_boxplot()
+#boxall
+
+basev = ggplot(data = dataset,
+               aes(x=reorder(REGION, ViolentCrimePer1000),
+                   y=ViolentCrimePer1000))
+boxv = basev + geom_boxplot()
+boxv = boxv + theme(axis.text.x = element_text(angle = 45,
+                                               hjust = 1,
+                                               size = 5))
+
+ggarrange(boxall, boxv, ncol = 1)
+```
+
+
+```{r}
+#linear graphs of crime
+base  = ggplot(dataset,aes(x=factor(HSRankQuartile), y=ViolentCrimePer1000))
+min = base + stat_summary(fun.y=min,
+                           geom="line",
+                           size=2,
+                           aes(group=1, col = 'Min'))
+#min #the min of violent crime per 1000
+min
+```
+
+```{r}
+max = min + stat_summary(fun.y = max,
+                         geom = "line",
+                         size = 2,
+                         aes(group = 1, col = "Max"))
+max
+```
+
+```{r}
+median = max + stat_summary(fun.y=median,
+                            geom="line",
+                            size=2,
+                            aes(group=1,col="Median"))
+median
+```
+
+```{r}
+mean = median + stat_summary(fun.y=mean,
+                            geom="line",
+                            size=2,
+                            aes(group=1,col="Mean"))
+mean
+```
+
+```{r}
+library(questionr)
+NumDf = freq(dataset$ViolentCrimePer1000)
+
+NumDf = data.frame(variable=as.numeric(row.names(NumDf)),
+                   NumDf,
+                   row.names = NULL)
+```
+
+
+```{r}
+library(ggplot2)
+base = ggplot(data=NumDf, aes(x = variable, y = n))
+base + geom_bar(stat = 'identity')
+```
+
+```{r}
+summary(dataset$ViolentCrimePer1000)
+```
+
+```{r}
+#standard deviation
+sd(dataset$ViolentCrimePer1000, na.rm = T)
+```
+
+```{r}
+#median absolute deviation
+mad(dataset$ViolentCrimePer1000, na.rm = T)
+```
+
+```{r}
+#asymmetry
+library(DescTools)
+Skew(dataset$ViolentCrimePer1000, na.rm = T, conf.level = 0.95, ci.type = "bca", R = 3000)
+```
+
+```{r}
+#shape
+Kurt(dataset$ViolentCrimePer1000, na.rm = T, conf.level = 0.95, ci.type = "bca", R=3000)
+```
+
+```{r}
+base = ggplot(dataset, aes(x = ViolentCrimePer1000))
+h1 = base + geom_histogram(binwidth = 2)
+h1
+
+d1 = base + stat_density(geom = "line")
+d1
+```
+
+```{r}
+MEAN = summary(dataset$ViolentCrimePer1000)[4]
+h1 + geom_vline(xintercept = MEAN)
+```
+
+```{r}
+theMean = mean(dataset$ViolentCrimePer1000, na.rm = T)
+theMedian = median(dataset$ViolentCrimePer1000, na.rm = T)
+
+d1 + geom_vline(xintercept = theMedian, color = 'blue') + geom_vline(xintercept = theMean,
+                                                                     color = 'red')
+```
+
+```{r}
+d1 + geom_vline(aes(xintercept = theMedian,color='median')) +
+     geom_vline(aes(xintercept =theMean,color='mean')) +
+     scale_color_manual(name = "Measures",
+                        values = c(median = "blue", mean = "red"),
+                        breaks = c('median','mean'),
+                       labels=c("MEDIAN", "MEAN"))
+```
+
+```{r}
+base = ggplot(dataset, aes(y = ViolentCrimePer1000))
+b1 = base + geom_boxplot()
+b1 + coord_flip()
+```
+
+```{r}
+theIQR = IQR(dataset$ViolentCrimePer1000, na.rm = T)
+```
+
+```{r}
+(upperT = summary(dataset$ViolentCrimePer1000)[[5]] + theIQR*1.5)
+```
+
+```{r}
+sum(dataset$ViolentCrimePer1000>upperT, na.rm = T)
+```
+
+```{r}
+#an attempt to represent the different distribution of crime 
+theVar=dataset$ViolentCrimePer1000
+theIQR = IQR(theVar, na.rm = T)
+
+upperT = summary(theVar)[[5]] + theIQR*1.5
+lowerT = summary(theVar)[[2]] - theIQR*1.5
+
+belows = dataset[which(theVar < lowerT),]
+normals = dataset[which(theVar >= lowerT & theVar <= upperT),]
+aboves = dataset[which(theVar > upperT),]
+
+```
+
+```{r}
+#the distribution appears to be normal
+base = ggplot(belows, aes(x = ViolentCrimePer1000))
+d1b = base + stat_density(geom = 'line') + labs(title = 'belows')
+
+base = ggplot(normals, aes(x = ViolentCrimePer1000))
+d1N = base + stat_density(geom = 'line') +labs(title = 'Normals', y = NULL)
+
+base = ggplot(aboves, aes(x = ViolentCrimePer1000))
+d1A = base + stat_density(geom = 'line') + labs(title = 'Aboves', y = NULL)
+```
+
+```{r}
+library(ggpubr)
+multid1_a = ggarrange(d1b,d1N,d1A,ncol = 3, nrow = 1)
+multid1_a
+```
+
+```{r}
+#dropping belows because no data falls into that category
+multid1_b = ggarrange(d1N,d1A,ncol = 1,nrow = 3)
+
+multid1AN = annotate_figure(multid1_b,
+                            top = text_grob("Visualizing Crime Per Capita Distribution",
+                                            face = "bold", size = 14),
+                            bottom = text_grob("Data source: FBI", 
+                                               hjust = 1, x = 1,
+                                               face = "italic", 
+                                               size = 10),
+                            left = "",
+                            right = "")
+
+multid1AN
+```
+
+Where Map Code Begins
+
+```{r}
+dataset$STATE <- as.character(dataset$STATE)
+dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
+str(dataset)
+```
+
+```{r}
+library(magrittr)
+sort(unique(dataset$STATE))%>%head(20)
+```
+
+
+```{r, eval=TRUE}
+USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
+```
+
+
+```{r, eval=TRUE}
+library(geojsonio)
+PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
+```
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+```{r}
+library(rmapshaper)
+USzipMap=ms_simplify(USzipMap)
+```
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+
+```{r, eval=TRUE}
+library(ggplot2)
+ggplot(data=USzipMap) + geom_sf()
+```
+
+```{r}
+names(USzipMap)
+```
+
+```{r}
+str(USzipMap$STATE_NAME)
+```
+
+```{r}
+layerUSMap=merge(USzipMap,dataset, 
+                   by.x='STATE_NAME', 
+                   by.y='STATE',
+                   all.x=F) # if no coincidence don't keep shape.
+```
+
+```{r, eval=TRUE,warning=FALSE}
+# This will make just a border of the state
+baseMap <- ms_dissolve(USzipMap)
+```
+
+This is the base map, which may help us show the missing shapes.
+```{r, eval=TRUE}
+ggplot(baseMap) + geom_sf()
+```
+
+```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide'}
+library(RColorBrewer)
+library(tmap)
+```
+
+2. Decide the amount of groups:
+
+```{r, eval=TRUE}
+numberOfClasses = 5
+```
+
+3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
+```{r, eval=TRUE}
+colorForScale='BuPu' # color scale
+RegionColor = 'Pastel1'
+```
+
+
+```{r, eval=TRUE}
+layerUSMap1 = layerUSMap
+layerUSMap2 = layerUSMap
+layerUSMap2$cut=cut_number(layerUSMap$Confidence,4,
+                            ordered_result=T,
+                            dig.lab=4)
+```
+```{r}
+baseLayer1 = ggplot(data=baseMap) + geom_sf()
+layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=REGION),show.legend = T)+
+    scale_fill_brewer(palette = RegionColor,name="Regions")
+layer1 = layer1 + theme_classic() + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())
+layer1
+```
+
+
+```{r}
+pacificx = c(-110,-125)
+pacificy = c(31,50)
+intermountainx =c(-115,-94)
+intermountainy = c(27,50)
+midwestx = c(-104,-81)
+midwesty = c(33,50)
+```
+
+```{r}
+baseLayer2=ggplot(data = baseMap) +geom_sf() 
+layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = colorForScale,
+                                   name = "Confidence")+theme_classic()
+layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())
+layer2 
+```
+```{r}
+pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)
+pacific2
+intermountain2 = layer2 + coord_sf(xlim=intermountainx, ylim=intermountainy)
+intermountain2
+midwest2 = layer2+coord_sf(xlim=midwestx,ylim=midwesty)
+midwest2
+```
+```{r}
+histobase = ggplot(data=dataset, aes(x=REGION, y=HighSchoolGradPct))
+Educhisto = histobase + geom_boxplot()+theme_classic()
+Educhisto
+```
+```{r}
+library(ggpubr)
+mixed2 = ggarrange(pacific2,intermountain2,midwest2,ncol=2,nrow=2)
+mixed2
+```
