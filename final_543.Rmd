@@ -53,8 +53,6 @@ base4=ggplot(data=dataset[dataset$HSRankQuartile==4,],
             aes(x=REGION,y=ViolentCrimePer1000)) 
 box4=base4 + geom_boxplot() + labs(title = "4th Quartile HS Rank")
 
-
-
 #all in one:
 ggarrange(box1,box2,box3,box4)
 ```
@@ -123,7 +121,6 @@ NumDf = data.frame(variable=as.numeric(row.names(NumDf)),
                    NumDf,
                    row.names = NULL)
 ```
-
 
 ```{r}
 library(ggplot2)
@@ -253,6 +250,42 @@ multid1AN = annotate_figure(multid1_b,
 
 multid1AN
 ```
+
+```{r}
+basegdp = ggplot(data = dataset,
+              aes(x=REGION, y = GDPperCapita))
+boxgdp = basegdp + geom_boxplot()
+boxgdp = boxgdp + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
+
+basecrime = ggplot(data = dataset,
+                   aes(x=REGION, y = ViolentCrimePer1000))
+boxcrime = basecrime + geom_boxplot()
+boxcrime = boxcrime + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
+
+baseinsure = ggplot(data = dataset,
+                    aes(x = REGION, y = Uninsured))
+boxinsure = baseinsure + geom_boxplot()
+boxinsure = boxinsure + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
+
+baseeduc = ggplot(data = dataset,
+                  aes(x = REGION, y = BachelorPct))
+boxedu = baseeduc + geom_boxplot()
+boxedu = boxedu + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
+
+
+ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
+```
+
+
+
 
 Where Map Code Begins
 
