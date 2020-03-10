@@ -284,6 +284,12 @@ boxedu = boxedu + theme(axis.text.x = element_text(angle = 45,
 ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
 ```
 
+```{r}
+#plot show the correlation between Violent Crime and Uninsured Rates
+baseregioncrime = ggplot(dataset, aes(x=UninsuredPCT, y=ViolentCrimeCapita))
+plotcrime = baseregioncrime + geom_point()
+plotcrime
+```
 
 
 
