@@ -298,9 +298,9 @@ midwest2 = layer2+coord_sf(xlim=midwestx,ylim=midwesty)
 midwest2
 ```
 ```{r}
-histobase = ggplot(data=dataset, aes(x=REGION, y=HighSchoolGradPct))
-Educhisto = histobase + geom_boxplot()+theme_classic()
-Educhisto
+Confidencehistobase = ggplot(data=dataset, aes(x=REGION, y=Confidence))
+Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic()
+Confidencehisto
 ```
 ```{r}
 library(ggpubr)
