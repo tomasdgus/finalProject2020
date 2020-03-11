@@ -9,16 +9,19 @@ dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020
 
 ```{r}
 #dataset$STATE <- dataset$ï..STATE
+dataset$STATE <- as.character(dataset$ï..STATE)
+str(dataset)
 ```
 
 ```{r}
 #sorting region by violent crimer per 1000
 library(magrittr)
+library(ggplot2)
 dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>%head(20)
 ```
 
 ```{r}
-aggregate(data=dataset, ViolentCrimeTotal~REGION,mean)
+#aggregate(data=dataset, ViolentCrimeTotal~REGION,mean)
 ```
 
 ```{r}
@@ -289,6 +292,7 @@ ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
 baseregioncrime = ggplot(dataset, aes(x=UninsuredPCT, y=ViolentCrimeCapita))
 plotcrime = baseregioncrime + geom_point()
 plotcrime
+str(dataset)
 ```
 
 
@@ -296,7 +300,6 @@ plotcrime
 Where Map Code Begins
 
 ```{r}
-dataset$STATE <- as.character(dataset$STATE)
 dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
 str(dataset)
 ```
@@ -392,7 +395,7 @@ layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=REGION),show.legend = 
 layer1 = layer1 + theme_classic() + theme(axis.line=element_blank(),axis.text.x=element_blank(),
           axis.text.y=element_blank(),axis.ticks=element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank())
+          axis.title.y=element_blank())+labs(title.text = "Regions of the U.S.",caption.text = "Source: U.S. National Park Service")+theme(plot.title = element_text(hjust=0.75),plot.caption = element_text(hjust=1.5))
 layer1
 ```
 
