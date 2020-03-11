@@ -6,6 +6,7 @@ dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020
 #dataset$STATE <- dataset$ï..STATE
 dataset$STATE <- as.character(dataset$ï..STATE)
 str(dataset)
+dataset$GDPperCapita <- as.numeric(dataset$GDPperCapita)
 ```
 
 ```{r}
@@ -152,9 +153,15 @@ ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
 ```{r}
 #plot show the correlation between Violent Crime and Uninsured Rates
 baseregioncrime = ggplot(dataset, aes(x=UninsuredPCT, y=ViolentCrimeCapita))
-plotcrime = baseregioncrime + geom_point()
+plotcrime = baseregioncrime + geom_point()+theme_classic()+labs(title.text = "Does No Health Insurance Cause Crime?")+theme(plot.title = element_text(h=0.5))
 plotcrime
-str(dataset)
+
+```
+```{r}
+basegdpcrime = ggplot(dataset, aes(x=HighSchoolGradPct, y=ViolentCrimeCapita))
+gdpcrime = basegdpcrime + geom_point()
+gdpcrime
+
 ```
 
 
