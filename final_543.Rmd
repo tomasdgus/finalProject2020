@@ -126,28 +126,28 @@ mean
 basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
               aes(x=REGION, y = GDPperCapita))
 boxgdp = basegdp + geom_boxplot()
-boxgdp = boxgdp + theme(axis.text.x = element_text(angle = 45,
+boxgdp = boxgdp + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 5))
+                                                   size = 8),axis.title.x = element_blank())
 basecrime = ggplot(data = dataset[dataset$ViolentCrimePer1000<=10,],
                    aes(x=REGION, y = ViolentCrimePer1000))
 boxcrime = basecrime + geom_boxplot()
-boxcrime = boxcrime + theme(axis.text.x = element_text(angle = 45,
+boxcrime = boxcrime + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 5))
+                                                   size = 8),axis.title.x = element_blank())
 baseinsure = ggplot(data = dataset,
                     aes(x = REGION, y = Uninsured))
 boxinsure = baseinsure + geom_boxplot()
-boxinsure = boxinsure + theme(axis.text.x = element_text(angle = 45,
+boxinsure = boxinsure + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 5))
+                                                   size = 8),axis.title.x = element_blank())
 baseeduc = ggplot(data = dataset,
                   aes(x = REGION, y = BachelorPct))
 boxedu = baseeduc + geom_boxplot()
-boxedu = boxedu + theme(axis.text.x = element_text(angle = 45,
+boxedu = boxedu + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 5))
-ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
+                                                   size = 8),axis.title.x = element_blank())
+annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("Main Measures by Region",size= 14,hjust=0.5))
 ```
 
 ```{r}
