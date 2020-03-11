@@ -153,17 +153,24 @@ annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("
 ```{r}
 #plot show the correlation between Violent Crime and Uninsured Rates
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
-plotcrime = baseregioncrime + geom_point()+theme_classic()+labs(title.text = "Does No Health Insurance Cause Crime?")+theme(plot.title = element_text(h=0.5))
+plotcrime = baseregioncrime + geom_point()+theme_classic()
 plotcrime
 
 ```
 ```{r}
-basegdpcrime = ggplot(dataset, aes(x=HighSchoolGradPct, y=ViolentCrimeCapita))
-gdpcrime = basegdpcrime + geom_point()
-gdpcrime
-
+baseregioncrime2 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$GDPperCapita<=120000,], aes(x=GDPperCapita, y=ViolentCrimePer1000))
+plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic()
+plotgdpcrime
 ```
-
+```{r}
+baseregioncrime3 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$HighSchoolGradPct>=.80,], aes(x=HighSchoolGradPct, y=ViolentCrimePer1000))
+plothscrime = baseregioncrime3 + geom_point()+theme_classic()
+plothscrime
+```
+```{r}
+crimeplots = annotate_figure(ggarrange(plotcrime,plotgdpcrime,plothscrime),top ="What Causes Crime?")
+crimeplots
+```
 
 
 Where Map Code Begins
@@ -276,6 +283,10 @@ intermountainx =c(-115,-94)
 intermountainy = c(27,50)
 midwestx = c(-104,-81)
 midwesty = c(33,50)
+southeastx = c(-94,-75)
+southeasty = c(20,38)
+northeastx = c(-80,-68)
+northeasty = c(40,48)
 ```
 
 ```{r}
@@ -290,12 +301,14 @@ layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
 layer2 
 ```
 ```{r}
-pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)
+pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)+theme(legend.position = 'none')
 pacific2
 intermountain2 = layer2 + coord_sf(xlim=intermountainx, ylim=intermountainy)
 intermountain2
 midwest2 = layer2+coord_sf(xlim=midwestx,ylim=midwesty)
 midwest2
+northeast2 = layer2+coord_sf(xlim=northeastx,ylim=northeasty)
+northeast2
 ```
 ```{r}
 Confidencehistobase = ggplot(data=dataset, aes(x=REGION, y=Confidence))
@@ -304,6 +317,7 @@ Confidencehisto
 ```
 ```{r}
 library(ggpubr)
-mixed2 = ggarrange(pacific2,intermountain2,midwest2,ncol=2,nrow=2)
-mixed2
+mixed2 = ggarrange(pacific2,northeast2,ncol=2,nrow=1)
+mixed2full = annotate_figure(mixed2,top = "Pacific vs. Northeast Region")
+mixed2full
 ```
