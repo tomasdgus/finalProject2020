@@ -81,7 +81,7 @@ numberOfClasses = 5
 
 3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
 ```{r, eval=TRUE}
-colorForScale='BuPu' # color scale
+colorForScale='Greens' # color scale
 RegionColor = 'Pastel1'
 ```
 
