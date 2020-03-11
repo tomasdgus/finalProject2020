@@ -1,8 +1,3 @@
----
-title: "Final"
-output: html_document
----
-
 ```{r}
 dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/dataset543.csv')
 ```
@@ -28,12 +23,14 @@ dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>
 #box plot of regional totals
 base = ggplot(data=dataset,
               aes(x=REGION, y = ViolentCrimeTotal))
-
 base + geom_boxplot()
 ```
 
 ```{r}
 aggregate(data=dataset, ViolentCrimeTotal~REGION,summary)
+```
+```{r}
+summary(dataset$REGION)
 ```
 
 ```{r}
@@ -42,20 +39,32 @@ library(ggpubr)
 base1=ggplot(data=dataset[dataset$HSRankQuartile==1,],
             aes(x=REGION,y=ViolentCrimePer1000)) 
 box1=base1 + geom_boxplot() + labs(title = "1st Quartile HS Rank")
+box1 = box1 + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
 
 base2=ggplot(data=dataset[dataset$HSRankQuartile==2,],
             aes(x=REGION,y=ViolentCrimePer1000))
 box2=base2 + geom_boxplot() + labs(title = "2nd Quartile HS Rank")
+box2 = box2 + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
+
 
 base3=ggplot(data=dataset[dataset$HSRankQuartile==3,],
             aes(x=REGION,y=ViolentCrimePer1000)) 
 box3=base3 + geom_boxplot() + labs(title = "3rd Quartile HS Rank")
+box3 = box3 + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
 
 
 base4=ggplot(data=dataset[dataset$HSRankQuartile==4,],
             aes(x=REGION,y=ViolentCrimePer1000)) 
 box4=base4 + geom_boxplot() + labs(title = "4th Quartile HS Rank")
-
+box4 = box4 + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 5))
 #all in one:
 ggarrange(box1,box2,box3,box4)
 ```
@@ -65,10 +74,8 @@ ggarrange(box1,box2,box3,box4)
 baseall = ggplot(data=dataset,
                  aes(x=as.factor(HSRankQuartile),
                      y=ViolentCrimePer1000))
-
 boxall = baseall + geom_boxplot()
 #boxall
-
 basev = ggplot(data = dataset,
                aes(x=reorder(REGION, ViolentCrimePer1000),
                    y=ViolentCrimePer1000))
@@ -76,7 +83,6 @@ boxv = basev + geom_boxplot()
 boxv = boxv + theme(axis.text.x = element_text(angle = 45,
                                                hjust = 1,
                                                size = 5))
-
 ggarrange(boxall, boxv, ncol = 1)
 ```
 
@@ -89,7 +95,7 @@ min = base + stat_summary(fun.y=min,
                            size=2,
                            aes(group=1, col = 'Min'))
 #min #the min of violent crime per 1000
-min
+
 ```
 
 ```{r}
@@ -97,7 +103,6 @@ max = min + stat_summary(fun.y = max,
                          geom = "line",
                          size = 2,
                          aes(group = 1, col = "Max"))
-max
 ```
 
 ```{r}
@@ -105,7 +110,6 @@ median = max + stat_summary(fun.y=median,
                             geom="line",
                             size=2,
                             aes(group=1,col="Median"))
-median
 ```
 
 ```{r}
@@ -116,143 +120,6 @@ mean = median + stat_summary(fun.y=mean,
 mean
 ```
 
-```{r}
-library(questionr)
-NumDf = freq(dataset$ViolentCrimePer1000)
-
-NumDf = data.frame(variable=as.numeric(row.names(NumDf)),
-                   NumDf,
-                   row.names = NULL)
-```
-
-```{r}
-library(ggplot2)
-base = ggplot(data=NumDf, aes(x = variable, y = n))
-base + geom_bar(stat = 'identity')
-```
-
-```{r}
-summary(dataset$ViolentCrimePer1000)
-```
-
-```{r}
-#standard deviation
-sd(dataset$ViolentCrimePer1000, na.rm = T)
-```
-
-```{r}
-#median absolute deviation
-mad(dataset$ViolentCrimePer1000, na.rm = T)
-```
-
-```{r}
-#asymmetry
-library(DescTools)
-Skew(dataset$ViolentCrimePer1000, na.rm = T, conf.level = 0.95, ci.type = "bca", R = 3000)
-```
-
-```{r}
-#shape
-Kurt(dataset$ViolentCrimePer1000, na.rm = T, conf.level = 0.95, ci.type = "bca", R=3000)
-```
-
-```{r}
-base = ggplot(dataset, aes(x = ViolentCrimePer1000))
-h1 = base + geom_histogram(binwidth = 2)
-h1
-
-d1 = base + stat_density(geom = "line")
-d1
-```
-
-```{r}
-MEAN = summary(dataset$ViolentCrimePer1000)[4]
-h1 + geom_vline(xintercept = MEAN)
-```
-
-```{r}
-theMean = mean(dataset$ViolentCrimePer1000, na.rm = T)
-theMedian = median(dataset$ViolentCrimePer1000, na.rm = T)
-
-d1 + geom_vline(xintercept = theMedian, color = 'blue') + geom_vline(xintercept = theMean,
-                                                                     color = 'red')
-```
-
-```{r}
-d1 + geom_vline(aes(xintercept = theMedian,color='median')) +
-     geom_vline(aes(xintercept =theMean,color='mean')) +
-     scale_color_manual(name = "Measures",
-                        values = c(median = "blue", mean = "red"),
-                        breaks = c('median','mean'),
-                       labels=c("MEDIAN", "MEAN"))
-```
-
-```{r}
-base = ggplot(dataset, aes(y = ViolentCrimePer1000))
-b1 = base + geom_boxplot()
-b1 + coord_flip()
-```
-
-```{r}
-theIQR = IQR(dataset$ViolentCrimePer1000, na.rm = T)
-```
-
-```{r}
-(upperT = summary(dataset$ViolentCrimePer1000)[[5]] + theIQR*1.5)
-```
-
-```{r}
-sum(dataset$ViolentCrimePer1000>upperT, na.rm = T)
-```
-
-```{r}
-#an attempt to represent the different distribution of crime 
-theVar=dataset$ViolentCrimePer1000
-theIQR = IQR(theVar, na.rm = T)
-
-upperT = summary(theVar)[[5]] + theIQR*1.5
-lowerT = summary(theVar)[[2]] - theIQR*1.5
-
-belows = dataset[which(theVar < lowerT),]
-normals = dataset[which(theVar >= lowerT & theVar <= upperT),]
-aboves = dataset[which(theVar > upperT),]
-
-```
-
-```{r}
-#the distribution appears to be normal
-base = ggplot(belows, aes(x = ViolentCrimePer1000))
-d1b = base + stat_density(geom = 'line') + labs(title = 'belows')
-
-base = ggplot(normals, aes(x = ViolentCrimePer1000))
-d1N = base + stat_density(geom = 'line') +labs(title = 'Normals', y = NULL)
-
-base = ggplot(aboves, aes(x = ViolentCrimePer1000))
-d1A = base + stat_density(geom = 'line') + labs(title = 'Aboves', y = NULL)
-```
-
-```{r}
-library(ggpubr)
-multid1_a = ggarrange(d1b,d1N,d1A,ncol = 3, nrow = 1)
-multid1_a
-```
-
-```{r}
-#dropping belows because no data falls into that category
-multid1_b = ggarrange(d1N,d1A,ncol = 1,nrow = 3)
-
-multid1AN = annotate_figure(multid1_b,
-                            top = text_grob("Visualizing Crime Per Capita Distribution",
-                                            face = "bold", size = 14),
-                            bottom = text_grob("Data source: FBI", 
-                                               hjust = 1, x = 1,
-                                               face = "italic", 
-                                               size = 10),
-                            left = "",
-                            right = "")
-
-multid1AN
-```
 
 ```{r}
 basegdp = ggplot(data = dataset,
@@ -261,29 +128,24 @@ boxgdp = basegdp + geom_boxplot()
 boxgdp = boxgdp + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 5))
-
 basecrime = ggplot(data = dataset,
                    aes(x=REGION, y = ViolentCrimePer1000))
 boxcrime = basecrime + geom_boxplot()
 boxcrime = boxcrime + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 5))
-
 baseinsure = ggplot(data = dataset,
                     aes(x = REGION, y = Uninsured))
 boxinsure = baseinsure + geom_boxplot()
 boxinsure = boxinsure + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 5))
-
 baseeduc = ggplot(data = dataset,
                   aes(x = REGION, y = BachelorPct))
 boxedu = baseeduc + geom_boxplot()
 boxedu = boxedu + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 5))
-
-
 ggarrange(boxgdp, boxcrime, boxinsure, boxedu)
 ```
 
