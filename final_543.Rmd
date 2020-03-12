@@ -172,18 +172,18 @@ annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("
 #plot show the correlation between Violent Crime and Uninsured Rates
 library(tidyverse)
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
-plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")+ geom_smooth(method="lm",se=FALSE)
 plotcrime
 
 ```
 ```{r}
 baseregioncrime2 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$GDPperCapita<=120000,], aes(x=GDPperCapita, y=ViolentCrimePer1000))
-plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic() + labs(caption = "Source: US Bureau of Economic Analysis")
+plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic() + labs(caption = "Source: US Bureau of Economic Analysis")+ geom_smooth(method="lm",se=FALSE)
 plotgdpcrime
 ```
 ```{r}
 baseregioncrime3 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$HighSchoolGradPct>=.80,], aes(x=HighSchoolGradPct, y=ViolentCrimePer1000))
-plothscrime = baseregioncrime3 + geom_point()+theme_classic() + labs(caption = "Source:US Census Bureau")
+plothscrime = baseregioncrime3 + geom_point()+theme_classic() + labs(caption = "Source:US Census Bureau")+ geom_smooth(method="lm",se=FALSE)
 plothscrime
 ```
 ```{r}
@@ -303,6 +303,8 @@ layerUSMap2 = layerUSMap
 layerUSMap2$cut=cut_number(layerUSMap$Confidence,4,
                             ordered_result=T,
                             dig.lab=4)
+layerUSMap3 = layerUSMap
+layerUSMap4 = layerUSMap
 ```
 ```{r}
 baseLayer1 = ggplot(data=baseMap) + geom_sf()
@@ -340,9 +342,38 @@ layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T)
 layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
           axis.text.y=element_blank(),axis.ticks=element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank())
+          axis.title.y=element_blank())+labs(title.text="State Confidence")+theme(plot.title = element_text(hjust=0.75))
 layer2 
 ```
+```{r}
+layerUSMap3$cut=cut_number(layerUSMap$Uninsured,2,
+                            ordered_result=T,
+                            dig.lab=2)
+baseLayer3=ggplot(data = baseMap) +geom_sf() 
+layer3 = baseLayer3 + geom_sf(data = layerUSMap3, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "Uninsured Rate")+theme_classic()
+layer3 = layer3 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "Uninsured Rate",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer3 
+```
+```{r}
+layerUSMap4$cut=cut_number(layerUSMap$HighSchoolGradPct,2,
+                            ordered_result=T,
+                            dig.lab=2)
+baseLayer4=ggplot(data = baseMap) +geom_sf() 
+layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "HS Grad %")+theme_classic()
+layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "High School Graduation Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer4 
+```
+
 ```{r}
 pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)+theme(legend.position = 'none')
 pacific2
