@@ -2,12 +2,14 @@
 dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/dataset543.csv')
 ```
 
+
 ```{r}
 #dataset$STATE <- dataset$ï..STATE
 dataset$STATE <- as.character(dataset$ï..STATE)
 str(dataset)
 dataset$GDPperCapita <- as.numeric(dataset$GDPperCapita)
 ```
+
 
 ```{r}
 #sorting region by violent crimer per 1000
@@ -16,9 +18,11 @@ library(ggplot2)
 dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>%head(20)
 ```
 
+
 ```{r}
 #aggregate(data=dataset, ViolentCrimeTotal~REGION,mean)
 ```
+
 
 ```{r}
 #box plot of regional totals
@@ -27,12 +31,14 @@ base = ggplot(data=dataset,
 base + geom_boxplot()
 ```
 
+
 ```{r}
 aggregate(data=dataset, ViolentCrimeTotal~REGION,summary)
 ```
 ```{r}
 summary(dataset$REGION)
 ```
+
 
 ```{r}
 #box plots broken by HS rank bucket
@@ -70,6 +76,7 @@ box4 = box4 + theme(axis.text.x = element_text(angle = 45,
 ggarrange(box1,box2,box3,box4)
 ```
 
+
 ```{r}
 #an attempt to show growing crime rates by hs quartile
 baseall = ggplot(data=dataset,
@@ -88,6 +95,8 @@ ggarrange(boxall, boxv, ncol = 1)
 ```
 
 
+
+
 ```{r}
 #linear graphs of crime
 base  = ggplot(dataset,aes(x=factor(HSRankQuartile), y=ViolentCrimePer1000))
@@ -99,6 +108,7 @@ min = base + stat_summary(fun.y=min,
 
 ```
 
+
 ```{r}
 max = min + stat_summary(fun.y = max,
                          geom = "line",
@@ -106,12 +116,14 @@ max = min + stat_summary(fun.y = max,
                          aes(group = 1, col = "Max"))
 ```
 
+
 ```{r}
 median = max + stat_summary(fun.y=median,
                             geom="line",
                             size=2,
                             aes(group=1,col="Median"))
 ```
+
 
 ```{r}
 mean = median + stat_summary(fun.y=mean,
@@ -122,63 +134,79 @@ mean
 ```
 
 
+
+
 ```{r}
 basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
               aes(x=REGION, y = GDPperCapita))
 boxgdp = basegdp + geom_boxplot()
 boxgdp = boxgdp + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 8),axis.title.x = element_blank())
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: Bureau of Economic Analysis")
 basecrime = ggplot(data = dataset[dataset$ViolentCrimePer1000<=10,],
                    aes(x=REGION, y = ViolentCrimePer1000))
 boxcrime = basecrime + geom_boxplot()
 boxcrime = boxcrime + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 8),axis.title.x = element_blank())
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: FBI State Crime Statistics")
+
 baseinsure = ggplot(data = dataset,
                     aes(x = REGION, y = Uninsured))
 boxinsure = baseinsure + geom_boxplot()
 boxinsure = boxinsure + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 8),axis.title.x = element_blank())
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: US Census Bureau Current Population Survey")
+
 baseeduc = ggplot(data = dataset,
                   aes(x = REGION, y = BachelorPct))
 boxedu = baseeduc + geom_boxplot()
 boxedu = boxedu + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
-                                                   size = 8),axis.title.x = element_blank())
-annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("Main Measures by Region",size= 14,hjust=0.5))
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: US Census Bureau")
+
+annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("Main Measures by Region\n",size= 14,hjust=0.5, face = "bold"))
 ```
+
 
 ```{r}
 #plot show the correlation between Violent Crime and Uninsured Rates
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
-plotcrime = baseregioncrime + geom_point()+theme_classic()
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")
 plotcrime
 
 ```
 ```{r}
 baseregioncrime2 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$GDPperCapita<=120000,], aes(x=GDPperCapita, y=ViolentCrimePer1000))
-plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic()
+plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic() + labs(caption = "Source: US Bureau of Economic Analysis")
 plotgdpcrime
 ```
 ```{r}
 baseregioncrime3 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$HighSchoolGradPct>=.80,], aes(x=HighSchoolGradPct, y=ViolentCrimePer1000))
-plothscrime = baseregioncrime3 + geom_point()+theme_classic()
+plothscrime = baseregioncrime3 + geom_point()+theme_classic() + labs(caption = "Source:US Census Bureau")
 plothscrime
 ```
 ```{r}
-crimeplots = annotate_figure(ggarrange(plotcrime,plotgdpcrime,plothscrime),top ="What Causes Crime?")
-crimeplots
+crimeplots = annotate_figure(ggarrange(plotcrime,plotgdpcrime,plothscrime), top ="",)
+crimeplots + labs(title = "What Causes Crime?") + theme(plot.title = element_text(face = "bold"))
+```
+
+```{r}
+#seperate code for insurance vs crime
+baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Does No Healthcare Cause Crime?",caption = "Source: US Census Bureau Current Population Survey")
+plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
 ```
 
 
 Where Map Code Begins
 
+
 ```{r}
 dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
 str(dataset)
 ```
+
 
 ```{r}
 library(magrittr)
@@ -186,9 +214,13 @@ sort(unique(dataset$STATE))%>%head(20)
 ```
 
 
+
+
 ```{r, eval=TRUE}
 USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
 ```
+
+
 
 
 ```{r, eval=TRUE}
@@ -196,6 +228,7 @@ library(geojsonio)
 PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
 ```
+
 
 ```{r, eval=TRUE}
 object.size(USzipMap)
@@ -205,22 +238,27 @@ library(rmapshaper)
 USzipMap=ms_simplify(USzipMap)
 ```
 
+
 ```{r, eval=TRUE}
 object.size(USzipMap)
 ```
+
 
 ```{r, eval=TRUE}
 library(ggplot2)
 ggplot(data=USzipMap) + geom_sf()
 ```
 
+
 ```{r}
 names(USzipMap)
 ```
 
+
 ```{r}
 str(USzipMap$STATE_NAME)
 ```
+
 
 ```{r}
 layerUSMap=merge(USzipMap,dataset, 
@@ -229,32 +267,40 @@ layerUSMap=merge(USzipMap,dataset,
                    all.x=F) # if no coincidence don't keep shape.
 ```
 
+
 ```{r, eval=TRUE,warning=FALSE}
 # This will make just a border of the state
 baseMap <- ms_dissolve(USzipMap)
 ```
+
 
 This is the base map, which may help us show the missing shapes.
 ```{r, eval=TRUE}
 ggplot(baseMap) + geom_sf()
 ```
 
+
 ```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide'}
 library(RColorBrewer)
 library(tmap)
 ```
 
+
 2. Decide the amount of groups:
+
 
 ```{r, eval=TRUE}
 numberOfClasses = 5
 ```
+
 
 3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
 ```{r, eval=TRUE}
 colorForScale='Greens' # color scale
 RegionColor = 'Pastel1'
 ```
+
+
 
 
 ```{r, eval=TRUE}
@@ -276,6 +322,8 @@ layer1
 ```
 
 
+
+
 ```{r}
 pacificx = c(-110,-125)
 pacificy = c(31,50)
@@ -288,6 +336,7 @@ southeasty = c(20,38)
 northeastx = c(-80,-68)
 northeasty = c(40,48)
 ```
+
 
 ```{r}
 baseLayer2=ggplot(data = baseMap) +geom_sf() 
