@@ -173,7 +173,6 @@ annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("
 library(tidyverse)
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
 plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")
-plotcrime = plotcrime + geom_smooth(method="lm",se=FALSE)
 plotcrime
 
 ```
@@ -195,7 +194,7 @@ crimeplots + labs(title = "What Causes Crime?") + theme(plot.title = element_tex
 ```{r}
 #seperate code for insurance vs crime
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
-plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Does No Healthcare Cause Crime?",caption = "Source: US Census Bureau Current Population Survey")
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Does No Healthcare Cause Crime?",caption = "Source: US Census Bureau Current Population Survey") + geom_smooth(method="lm",se=FALSE)
 plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
 ```
