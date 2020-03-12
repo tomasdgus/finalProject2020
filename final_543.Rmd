@@ -170,8 +170,10 @@ annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("
 
 ```{r}
 #plot show the correlation between Violent Crime and Uninsured Rates
+library(tidyverse)
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
 plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")
+plotcrime = plotcrime + geom_smooth(method="lm",se=FALSE)
 plotcrime
 
 ```
@@ -213,22 +215,15 @@ library(magrittr)
 sort(unique(dataset$STATE))%>%head(20)
 ```
 
-
-
-
 ```{r, eval=TRUE}
 USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
 ```
-
-
-
 
 ```{r, eval=TRUE}
 library(geojsonio)
 PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
 ```
-
 
 ```{r, eval=TRUE}
 object.size(USzipMap)
