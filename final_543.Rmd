@@ -195,8 +195,10 @@ crimeplots + labs(title = "What Is Related to Crime?") + theme(plot.title = elem
 #seperate code for insurance vs crime
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
 plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Is No Healthcare Related to Crime?",caption = "Source: US Census Bureau Current Population Survey") + geom_smooth(method="lm",se=FALSE)
-plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
-
+plotcrime = plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+plotcrime = plotcrime + annotate("text",x= 0.18,y=6.4,label="Alaska")+
+                        annotate("text",x=0.06,y=1,label="Vermont")
+plotcrime
 ```
 
 
