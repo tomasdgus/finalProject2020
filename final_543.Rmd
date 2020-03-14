@@ -8,6 +8,8 @@ dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020
 dataset$STATE <- as.character(dataset$ï..STATE)
 str(dataset)
 dataset$GDPperCapita <- as.numeric(dataset$GDPperCapita)
+dataset$InsuredPCT <- as.numeric(1-dataset$UninsuredPCT)
+dataset$HSDropOut <- as.numeric(1-dataset$HighSchoolGradPct)
 ```
 
 
@@ -307,6 +309,7 @@ layerUSMap2$cut=cut_number(layerUSMap$Confidence,4,
                             dig.lab=4)
 layerUSMap3 = layerUSMap
 layerUSMap4 = layerUSMap
+layerUSMap5 = layerUSMap
 ```
 ```{r}
 baseLayer1 = ggplot(data=baseMap) + geom_sf()
@@ -362,19 +365,37 @@ layer3 = layer3 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
 layer3 
 ```
 ```{r}
-layerUSMap4$cut=cut_number(layerUSMap$HighSchoolGradPct,2,
+layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
                             ordered_result=T,
                             dig.lab=2)
 baseLayer4=ggplot(data = baseMap) +geom_sf() 
 layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
                  scale_fill_brewer(palette = 'PuBu',
-                                   name = "HS Grad %")+theme_classic()
+                                   name = "HS Drop Out %")+theme_classic()
 layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
           axis.text.y=element_blank(),axis.ticks=element_blank(),
           axis.title.x=element_blank(),
-          axis.title.y=element_blank())+labs(title = "High School Graduation Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+          axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
 layer4 
 ```
+```{r}
+layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
+                            ordered_result=T,
+                            dig.lab=4)
+baseLayer5=ggplot(data = baseMap) +geom_sf() 
+layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "Violent Crime per Capita")+theme_classic()
+layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer5 
+```
+```{r}
+ggarrange(layer3,layer4,layer5)
+```
+
 
 ```{r}
 pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)+theme(legend.position = 'none')
