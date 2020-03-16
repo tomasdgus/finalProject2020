@@ -1,0 +1,321 @@
+---
+title: "TA543"
+output: html_document
+---
+
+```{r}
+dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/dataset543.csv')
+```
+
+```{r}
+dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
+str(dataset)
+```
+
+
+```{r}
+library(magrittr)
+sort(unique(dataset$STATE))%>%head(20)
+```
+
+```{r, eval=TRUE}
+USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
+```
+
+```{r, eval=TRUE}
+library(geojsonio)
+PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
+```
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+```{r}
+library(rmapshaper)
+USzipMap=ms_simplify(USzipMap)
+```
+
+
+```{r, eval=TRUE}
+object.size(USzipMap)
+```
+
+
+```{r, eval=TRUE}
+library(ggplot2)
+ggplot(data=USzipMap) + geom_sf()
+```
+
+
+```{r}
+names(USzipMap)
+```
+
+
+```{r}
+str(USzipMap$STATE_NAME)
+```
+
+
+```{r}
+layerUSMap=merge(USzipMap,dataset, 
+                   by.x='STATE_NAME', 
+                   by.y='STATE',
+                   all.x=F) # if no coincidence don't keep shape.
+```
+
+
+```{r, eval=TRUE,warning=FALSE}
+# This will make just a border of the state
+baseMap <- ms_dissolve(USzipMap)
+```
+
+
+This is the base map, which may help us show the missing shapes.
+```{r, eval=TRUE}
+ggplot(baseMap) + geom_sf()
+```
+
+
+```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide'}
+library(RColorBrewer)
+library(tmap)
+```
+
+
+2. Decide the amount of groups:
+
+
+```{r, eval=TRUE}
+numberOfClasses = 5
+```
+
+
+3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
+```{r, eval=TRUE}
+colorForScale='Greens' # color scale
+RegionColor = 'Pastel1'
+```
+
+
+
+Map of the Region Breakdown
+```{r, eval=TRUE}
+layerUSMap1 = layerUSMap
+layerUSMap2 = layerUSMap
+layerUSMap2$cut=cut_number(layerUSMap$Confidence,4,
+                            ordered_result=T,
+                            dig.lab=4)
+layerUSMap3 = layerUSMap
+layerUSMap4 = layerUSMap
+layerUSMap5 = layerUSMap
+```
+
+```{r}
+baseLayer1 = ggplot(data=baseMap) + geom_sf()
+layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=REGION),show.legend = T)+
+    scale_fill_brewer(palette = RegionColor,name="Regions")
+layer1 = layer1 + theme_classic() + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title.text = "Regions of the U.S.",caption.text = "Source: U.S. National Park Service")+theme(plot.title = element_text(hjust=0.75),plot.caption = element_text(hjust=1.5))
+layer1
+```
+
+
+```{r}
+#dataset$STATE <- dataset$ï..STATE
+#dataset$STATE <- as.character(dataset$ï..STATE)
+str(dataset)
+dataset$GDPperCapita <- as.numeric(dataset$GDPperCapita)
+dataset$InsuredPCT <- as.numeric(1-dataset$UninsuredPCT)
+dataset$HSDropOut <- as.numeric(1-dataset$HighSchoolGradPct)
+```
+
+
+```{r}
+#sorting region by violent crimer per 1000
+library(magrittr)
+library(ggplot2)
+dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>%head(20)
+```
+
+High School Graduation Rates By Region
+```{r}
+library(forcats)
+basehsgr = ggplot(data = dataset, aes(x = fct_reorder(REGION, HighSchoolGradPct),y = HighSchoolGradPct),
+                  xlab = ("Region"))
+basehsgr = basehsgr + geom_boxplot() + labs(title = "High School Graduation Rates By Region")
+basehsgr = basehsgr + theme_classic() + theme(axis.title.x = element_blank(), plot.title = element_text(hjust = 0.5, face = "bold"))  
+basehsgr
+```
+
+Uninsured Rates By Region
+```{r}
+baseinsurex = ggplot(data = dataset,
+                    aes(x = fct_reorder(REGION, Uninsured), y = Uninsured))
+boxinsurex = baseinsurex + geom_boxplot()
+boxinsurex = boxinsurex + theme_classic() + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 8),axis.title.x = element_blank()) + labs(title = "Uninsured Rates By Region", caption = "Source: US Census Bureau Current Population Survey") + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+boxinsurex
+```
+
+Main Measures By Region
+```{r}
+basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
+              aes(x= fct_reorder(REGION, GDPperCapita), y = GDPperCapita))
+boxgdp = basegdp + geom_boxplot()
+boxgdp = boxgdp + theme_classic() + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: Bureau of Economic Analysis")
+basecrime = ggplot(data = dataset[dataset$ViolentCrimePer1000<=10,],
+                   aes(x=fct_reorder(REGION, ViolentCrimePer1000), y = ViolentCrimePer1000))
+boxcrime = basecrime + geom_boxplot()
+boxcrime = boxcrime + theme_classic() + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: FBI State Crime Statistics")
+baseinsure = ggplot(data = dataset,
+                    aes(x = fct_reorder(REGION, Uninsured), y = Uninsured))
+boxinsure = baseinsure + geom_boxplot()
+boxinsure = boxinsure + theme_classic() + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: US Census Bureau Current Population Survey")
+baseeduc = ggplot(data = dataset,
+                  aes(x = fct_reorder(REGION, BachelorPct), y = BachelorPct))
+boxedu = baseeduc + geom_boxplot()
+boxedu = boxedu + theme_classic() + theme(axis.text.x = element_text(angle = 45,
+                                                   hjust = 1,
+                                                   size = 8),axis.title.x = element_blank()) + labs(caption = "Source: US Census Bureau")
+annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("Main Measures by Region\n",size= 14,hjust=0.5, face = "bold"))
+```
+
+What Is Related to Crime?
+```{r}
+#plot show the correlation between Violent Crime and Uninsured Rates
+library(tidyverse)
+baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(caption = "Source: US Census Bureau Current Population Survey")+ geom_smooth(method="lm",se=FALSE)
+
+
+baseregioncrime2 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$GDPperCapita<=120000,], aes(x=GDPperCapita, y=ViolentCrimePer1000))
+plotgdpcrime = baseregioncrime2 + geom_point()+theme_classic() + labs(caption = "Source: US Bureau of Economic Analysis")+ geom_smooth(method="lm",se=FALSE)
+
+
+
+baseregioncrime3 = ggplot(dataset[dataset$ViolentCrimePer1000<=10&dataset$HighSchoolGradPct>=.80,], aes(x=HighSchoolGradPct, y=ViolentCrimePer1000))
+plothscrime = baseregioncrime3 + geom_point()+theme_classic() + labs(caption = "Source:US Census Bureau")+ geom_smooth(method="lm",se=FALSE)
+
+
+crimeplots = annotate_figure(ggarrange(plotcrime,plotgdpcrime,plothscrime), top ="",)
+crimeplots + labs(title = "What Is Related to Crime?") + theme(plot.title = element_text(face = "bold"))
+```
+
+A Closer Look at Crime with Uninsured Percentages
+```{r}
+baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
+plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Is No Healthcare Related to Crime?",caption = "(Excluding Washington DC) Source: US Census Bureau Current Population Survey") + geom_smooth(method="lm",se=FALSE)
+plotcrime = plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+plotcrime = plotcrime + annotate("text",x= 0.18,y=6.4,label="Alaska")+
+                        annotate("text",x=0.06,y=1,label="Vermont")
+plotcrime
+```
+
+State Confidence
+```{r}
+pacificx = c(-110,-125)
+pacificy = c(31,50)
+intermountainx =c(-115,-94)
+intermountainy = c(27,50)
+midwestx = c(-104,-81)
+midwesty = c(33,50)
+southeastx = c(-94,-75)
+southeasty = c(20,38)
+northeastx = c(-80,-68)
+northeasty = c(40,48)
+```
+
+
+```{r}
+baseLayer2=ggplot(data = baseMap) +geom_sf() 
+layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = colorForScale,
+                                   name = "Confidence")+theme_classic()
+layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title.text="State Confidence")+theme(plot.title = element_text(hjust=0.75))
+layer2 
+```
+
+```{r}
+layerUSMap3$cut=cut_number(layerUSMap$Uninsured,2,
+                            ordered_result=T,
+                            dig.lab=2)
+baseLayer3=ggplot(data = baseMap) +geom_sf() 
+layer3 = baseLayer3 + geom_sf(data = layerUSMap3, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "Uninsured Rate")+theme_classic()
+layer3 = layer3 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "Uninsured Rate",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer3 
+```
+
+```{r}
+layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
+                            ordered_result=T,
+                            dig.lab=2)
+baseLayer4=ggplot(data = baseMap) +geom_sf() 
+layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "HS Drop Out %")+theme_classic()
+layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer4 
+```
+```{r}
+layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
+                            ordered_result=T,
+                            dig.lab=4)
+baseLayer5=ggplot(data = baseMap) +geom_sf() 
+layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "Violent Crime per Capita")+theme_classic()
+layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer5 
+```
+```{r}
+ggarrange(layer3,layer4,layer5)
+```
+
+
+```{r}
+pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)+theme(legend.position = 'none')
+pacific2
+intermountain2 = layer2 + coord_sf(xlim=intermountainx, ylim=intermountainy)
+intermountain2
+midwest2 = layer2+coord_sf(xlim=midwestx,ylim=midwesty)
+midwest2
+northeast2 = layer2+coord_sf(xlim=northeastx,ylim=northeasty)
+northeast2
+```
+```{r}
+Confidencehistobase = ggplot(data=dataset, aes(x=fct_reorder(REGION,Confidence), y=Confidence))
+Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic() + theme(axis.title.x = element_blank())
+Confidencehisto
+```
+
+```{r}
+library(ggpubr)
+mixed2 = ggarrange(pacific2,northeast2,ncol=2,nrow=1)
+mixed2full = annotate_figure(mixed2,top = "Pacific vs. Northeast Region")
+mixed2full
+```
