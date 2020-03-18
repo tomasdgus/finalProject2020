@@ -165,25 +165,25 @@ boxinsurex
 Main Measures By Region
 ```{r}
 basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
-              aes(x= fct_reorder(REGION, GDPperCapita), y = GDPperCapita))
+              aes(x= REGION, y = GDPperCapita))
 boxgdp = basegdp + geom_boxplot()
 boxgdp = boxgdp + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 8),axis.title.x = element_blank()) + labs(caption = "Source: Bureau of Economic Analysis")
 basecrime = ggplot(data = dataset[dataset$ViolentCrimePer1000<=10,],
-                   aes(x=fct_reorder(REGION, ViolentCrimePer1000), y = ViolentCrimePer1000))
+                   aes(x=REGION, y = ViolentCrimePer1000))
 boxcrime = basecrime + geom_boxplot()
 boxcrime = boxcrime + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 8),axis.title.x = element_blank()) + labs(caption = "Source: FBI State Crime Statistics")
 baseinsure = ggplot(data = dataset,
-                    aes(x = fct_reorder(REGION, Uninsured), y = Uninsured))
+                    aes(x = REGION, y = Uninsured))
 boxinsure = baseinsure + geom_boxplot()
 boxinsure = boxinsure + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 8),axis.title.x = element_blank()) + labs(caption = "Source: US Census Bureau Current Population Survey")
 baseeduc = ggplot(data = dataset,
-                  aes(x = fct_reorder(REGION, BachelorPct), y = BachelorPct))
+                  aes(x = REGION, y = BachelorPct))
 boxedu = baseeduc + geom_boxplot()
 boxedu = boxedu + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
