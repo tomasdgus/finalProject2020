@@ -12,6 +12,9 @@ dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
 str(dataset)
 ```
 
+```{r}
+library(ggpubr)
+```
 
 ```{r}
 library(magrittr)
@@ -31,6 +34,7 @@ USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
 ```{r, eval=TRUE}
 object.size(USzipMap)
 ```
+
 ```{r}
 library(rmapshaper)
 USzipMap=ms_simplify(USzipMap)
@@ -164,14 +168,15 @@ boxinsurex
 
 Main Measures By Region
 ```{r}
+library(ggplot2)
 basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
-              aes(x= REGION, y = GDPperCapita))
+              aes(x = REGION, y = GDPperCapita))
 boxgdp = basegdp + geom_boxplot()
 boxgdp = boxgdp + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
                                                    size = 8),axis.title.x = element_blank()) + labs(caption = "Source: Bureau of Economic Analysis")
 basecrime = ggplot(data = dataset[dataset$ViolentCrimePer1000<=10,],
-                   aes(x=REGION, y = ViolentCrimePer1000))
+                   aes(x = REGION, y = ViolentCrimePer1000))
 boxcrime = basecrime + geom_boxplot()
 boxcrime = boxcrime + theme_classic() + theme(axis.text.x = element_text(angle = 45,
                                                    hjust = 1,
@@ -265,35 +270,37 @@ layer3
 ```
 
 ```{r}
-layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
-                            ordered_result=T,
-                            dig.lab=2)
-baseLayer4=ggplot(data = baseMap) +geom_sf() 
-layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
-                 scale_fill_brewer(palette = 'PuBu',
-                                   name = "HS Drop Out %")+theme_classic()
-layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.text.y=element_blank(),axis.ticks=element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
-layer4 
+#layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
+                            #ordered_result=T,
+                            #dig.lab=2)
+#baseLayer4=ggplot(data = baseMap) +geom_sf() 
+#layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
+                 #scale_fill_brewer(palette = 'PuBu',
+                                   #name = "HS Drop Out %")+theme_classic()
+#layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          #axis.text.y=element_blank(),axis.ticks=element_blank(),
+          #axis.title.x=element_blank(),
+          #axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+#layer4 
 ```
+
 ```{r}
-layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
-                            ordered_result=T,
-                            dig.lab=4)
-baseLayer5=ggplot(data = baseMap) +geom_sf() 
-layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
-                 scale_fill_brewer(palette = 'PuBu',
-                                   name = "Violent Crime per Capita")+theme_classic()
-layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          axis.text.y=element_blank(),axis.ticks=element_blank(),
-          axis.title.x=element_blank(),
-          axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
-layer5 
+#layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
+                            #ordered_result=T,
+                            #dig.lab=4)
+#baseLayer5=ggplot(data = baseMap) +geom_sf() 
+#layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
+                 #scale_fill_brewer(palette = 'PuBu',
+                                   #name = "Violent Crime per Capita")+theme_classic()
+#layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          #axis.text.y=element_blank(),axis.ticks=element_blank(),
+          #axis.title.x=element_blank(),
+          #axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+#layer5 
 ```
+
 ```{r}
-ggarrange(layer3,layer4,layer5)
+#ggarrange(layer3,layer4,layer5)
 ```
 
 
@@ -316,7 +323,7 @@ Confidencehisto
 ```
 
 ```{r}
-library(ggpubr)
+#library(ggpubr)
 mixed2 = ggarrange(pacific2,northeast2,ncol=2,nrow=1)
 mixed2full = annotate_figure(mixed2,top = "Pacific vs. Northeast Region")
 mixed2full
