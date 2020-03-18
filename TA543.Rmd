@@ -3,66 +3,46 @@ title: "TA543"
 output: html_document
 ---
 
-```{r}
+```{r echo=FALSE}
 dataset = read.csv('https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/dataset543.csv')
 ```
 
-```{r}
+```{r echo=FALSE}
 dataset$RegionNumber <- as.numeric(dataset$RegionNumber)
-str(dataset)
+dataset$STATE <- as.character(dataset$ï..STATE )
+dataset$HSDropOut <- as.numeric(1-dataset$HighSchoolGradPct)
 ```
 
-```{r}
+```{r echo=FALSE,results='hide',message=FALSE}
 library(ggpubr)
 ```
 
-```{r}
+```{r echo=FALSE,results='hide',message=FALSE}
 library(magrittr)
 sort(unique(dataset$STATE))%>%head(20)
 ```
 
-```{r, eval=TRUE}
+```{r, echo=FALSE, eval=TRUE,results='hide'}
 USmap="https://raw.githubusercontent.com/tomasdgus/finalProject2020/master/states.json"
 ```
 
-```{r, eval=TRUE}
+```{r, echo=FALSE,results='hide',message=FALSE}
 library(geojsonio)
 PROJmap="+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 USzipMap=topojson_read(USmap,crs=PROJmap,stringsAsFactors = FALSE)
 ```
 
-```{r, eval=TRUE}
-object.size(USzipMap)
-```
-
-```{r}
+```{r, echo=FALSE,results='hide',message=FALSE}
 library(rmapshaper)
 USzipMap=ms_simplify(USzipMap)
 ```
 
-
-```{r, eval=TRUE}
-object.size(USzipMap)
-```
-
-
-```{r, eval=TRUE}
+```{r,echo=FALSE,results='hide',message=FALSE}
 library(ggplot2)
-ggplot(data=USzipMap) + geom_sf()
+normalmap = ggplot(data=USzipMap) + geom_sf()
 ```
 
-
-```{r}
-names(USzipMap)
-```
-
-
-```{r}
-str(USzipMap$STATE_NAME)
-```
-
-
-```{r}
+```{r,echo=FALSE,results='hide'}
 layerUSMap=merge(USzipMap,dataset, 
                    by.x='STATE_NAME', 
                    by.y='STATE',
@@ -70,42 +50,28 @@ layerUSMap=merge(USzipMap,dataset,
 ```
 
 
-```{r, eval=TRUE,warning=FALSE}
+```{r, eval=TRUE,warning=FALSE,echo=FALSE}
 # This will make just a border of the state
 baseMap <- ms_dissolve(USzipMap)
 ```
 
-
-This is the base map, which may help us show the missing shapes.
-```{r, eval=TRUE}
-ggplot(baseMap) + geom_sf()
-```
-
-
-```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide'}
+```{r, eval=TRUE,warning=FALSE,message=FALSE,results='hide',echo=FALSE}
 library(RColorBrewer)
 library(tmap)
 ```
 
-
-2. Decide the amount of groups:
-
-
-```{r, eval=TRUE}
+```{r, eval=TRUE,echo=FALSE,results='hide'}
 numberOfClasses = 5
 ```
 
 
-3. Decide colors for each group of shapes (I chose a palette from [here](http://colorbrewer2.org/)):
-```{r, eval=TRUE}
+```{r, eval=TRUE,echo=FALSE,results='hide'}
 colorForScale='Greens' # color scale
 RegionColor = 'Pastel1'
 ```
 
-
-
 Map of the Region Breakdown
-```{r, eval=TRUE}
+```{r, eval=TRUE,echo=FALSE,results='hide'}
 layerUSMap1 = layerUSMap
 layerUSMap2 = layerUSMap
 layerUSMap2$cut=cut_number(layerUSMap$Confidence,4,
@@ -116,7 +82,7 @@ layerUSMap4 = layerUSMap
 layerUSMap5 = layerUSMap
 ```
 
-```{r}
+```{r,echo=FALSE,results='hide'}
 baseLayer1 = ggplot(data=baseMap) + geom_sf()
 layer1 = baseLayer1 +geom_sf(data = layerUSMap1, aes(fill=REGION),show.legend = T)+
     scale_fill_brewer(palette = RegionColor,name="Regions")
@@ -128,17 +94,13 @@ layer1
 ```
 
 
-```{r}
-#dataset$STATE <- dataset$ï..STATE
-#dataset$STATE <- as.character(dataset$ï..STATE)
-str(dataset)
+```{r echo=FALSE,results='hide'}
 dataset$GDPperCapita <- as.numeric(dataset$GDPperCapita)
-dataset$InsuredPCT <- as.numeric(1-dataset$UninsuredPCT)
 dataset$HSDropOut <- as.numeric(1-dataset$HighSchoolGradPct)
 ```
 
 
-```{r}
+```{r echo=FALSE,results='hide'}
 #sorting region by violent crimer per 1000
 library(magrittr)
 library(ggplot2)
@@ -146,8 +108,11 @@ dataset[order(-dataset$ViolentCrimePer1000),c('REGION','ViolentCrimePer1000')]%>
 ```
 
 High School Graduation Rates By Region
-```{r}
+```{r echo=FALSE,results='hide',message=FALSE,warning=FALSE}
 library(forcats)
+
+```
+```{r echo=FALSE}
 basehsgr = ggplot(data = dataset, aes(x = fct_reorder(REGION, HighSchoolGradPct),y = HighSchoolGradPct),
                   xlab = ("Region"))
 basehsgr = basehsgr + geom_boxplot() + labs(title = "High School Graduation Rates By Region")
@@ -156,7 +121,7 @@ basehsgr
 ```
 
 Uninsured Rates By Region
-```{r}
+```{r echo=FALSE}
 baseinsurex = ggplot(data = dataset,
                     aes(x = fct_reorder(REGION, Uninsured), y = Uninsured))
 boxinsurex = baseinsurex + geom_boxplot()
@@ -167,8 +132,7 @@ boxinsurex
 ```
 
 Main Measures By Region
-```{r}
-library(ggplot2)
+```{r echo=FALSE}
 basegdp = ggplot(data = dataset[dataset$GDPperCapita <=120000,],
               aes(x = REGION, y = GDPperCapita))
 boxgdp = basegdp + geom_boxplot()
@@ -197,7 +161,7 @@ annotate_figure(ggarrange(boxgdp, boxcrime, boxinsure, boxedu),top = text_grob("
 ```
 
 What Is Related to Crime?
-```{r}
+```{r,echo=FALSE,warning=FALSE,results='hide',message=FALSE}
 #plot show the correlation between Violent Crime and Uninsured Rates
 library(tidyverse)
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
@@ -218,7 +182,7 @@ crimeplots + labs(title = "What Is Related to Crime?") + theme(plot.title = elem
 ```
 
 A Closer Look at Crime with Uninsured Percentages
-```{r}
+```{r,echo=FALSE}
 baseregioncrime = ggplot(dataset[dataset$ViolentCrimePer1000<=10,], aes(x=UninsuredPCT, y=ViolentCrimePer1000))
 plotcrime = baseregioncrime + geom_point()+theme_classic() + labs(title = "Is No Healthcare Related to Crime?",caption = "(Excluding Washington DC) Source: US Census Bureau Current Population Survey") + geom_smooth(method="lm",se=FALSE)
 plotcrime = plotcrime + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
@@ -228,7 +192,7 @@ plotcrime
 ```
 
 State Confidence
-```{r}
+```{r,echo=FALSE}
 pacificx = c(-110,-125)
 pacificy = c(31,50)
 intermountainx =c(-115,-94)
@@ -241,8 +205,15 @@ northeastx = c(-80,-68)
 northeasty = c(40,48)
 ```
 
+```{r,echo=FALSE}
+Confidencehistobase = ggplot(data=dataset, aes(x=fct_reorder(REGION,Confidence), y=Confidence))
+Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic() + theme(axis.title.x = element_blank()) + labs(title = "Confidence By Region") 
+Confidencehisto = Confidencehisto + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+Confidencehisto
+```
 
-```{r}
+
+```{r,echo=FALSE}
 baseLayer2=ggplot(data = baseMap) +geom_sf() 
 layer2 = baseLayer2 + geom_sf(data = layerUSMap2, aes(fill=cut),show.legend = T) +
                  scale_fill_brewer(palette = colorForScale,
@@ -254,7 +225,7 @@ layer2 = layer2 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
 layer2 
 ```
 
-```{r}
+```{r,echo=FALSE}
 layerUSMap3$cut=cut_number(layerUSMap$Uninsured,2,
                             ordered_result=T,
                             dig.lab=2)
@@ -269,60 +240,44 @@ layer3 = layer3 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
 layer3 
 ```
 
-```{r}
-#layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
-                            #ordered_result=T,
-                            #dig.lab=2)
-#baseLayer4=ggplot(data = baseMap) +geom_sf() 
-#layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
-                 #scale_fill_brewer(palette = 'PuBu',
-                                   #name = "HS Drop Out %")+theme_classic()
-#layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          #axis.text.y=element_blank(),axis.ticks=element_blank(),
-          #axis.title.x=element_blank(),
-          #axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
-#layer4 
+```{r,echo=FALSE}
+layerUSMap4$cut=cut_number(layerUSMap$HSDropOut,2,
+                            ordered_result=T,
+                            dig.lab=2)
+baseLayer4=ggplot(data = baseMap) +geom_sf() 
+layer4 = baseLayer4 + geom_sf(data = layerUSMap4, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "HS Drop Out %")+theme_classic()
+layer4 = layer4 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "High School Drop Out Percentage",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer4 
 ```
 
-```{r}
-#layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
-                            #ordered_result=T,
-                            #dig.lab=4)
-#baseLayer5=ggplot(data = baseMap) +geom_sf() 
-#layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
-                 #scale_fill_brewer(palette = 'PuBu',
-                                   #name = "Violent Crime per Capita")+theme_classic()
-#layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
-          #axis.text.y=element_blank(),axis.ticks=element_blank(),
-          #axis.title.x=element_blank(),
-          #axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
-#layer5 
+```{r,echo=FALSE}
+layerUSMap5$cut=cut_number(layerUSMap$ViolentCrimePer1000,2,
+                            ordered_result=T,
+                            dig.lab=4)
+baseLayer5=ggplot(data = baseMap) +geom_sf() 
+layer5 = baseLayer5 + geom_sf(data = layerUSMap5, aes(fill=cut),show.legend = T) +
+                 scale_fill_brewer(palette = 'PuBu',
+                                   name = "Violent Crime per Capita")+theme_classic()
+layer5 = layer5 + theme(axis.line=element_blank(),axis.text.x=element_blank(),
+          axis.text.y=element_blank(),axis.ticks=element_blank(),
+          axis.title.x=element_blank(),
+          axis.title.y=element_blank())+labs(title = "Violent Crime per Capita",caption= "Source:US Census Bureau")+theme(plot.title = element_text(hjust=0.75))
+layer5 
 ```
 
-```{r}
-#ggarrange(layer3,layer4,layer5)
-```
-
-
-```{r}
+```{r,echo=FALSE}
 pacific2 = layer2 + coord_sf(xlim = pacificx ,ylim=pacificy)+theme(legend.position = 'none')
 pacific2
-intermountain2 = layer2 + coord_sf(xlim=intermountainx, ylim=intermountainy)
-intermountain2
-midwest2 = layer2+coord_sf(xlim=midwestx,ylim=midwesty)
-midwest2
 northeast2 = layer2+coord_sf(xlim=northeastx,ylim=northeasty)
 northeast2
 ```
 
-```{r}
-Confidencehistobase = ggplot(data=dataset, aes(x=fct_reorder(REGION,Confidence), y=Confidence))
-Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic() + theme(axis.title.x = element_blank()) + labs(title = "Confidence By Region") 
-Confidencehisto = Confidencehisto + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
-Confidencehisto
-```
-
-```{r}
+```{r,echo=FALSE}
 #library(ggpubr)
 mixed2 = ggarrange(pacific2,northeast2,ncol=2,nrow=1)
 mixed2full = annotate_figure(mixed2,top = "Pacific vs. Northeast Region")
