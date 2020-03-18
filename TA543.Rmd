@@ -307,9 +307,11 @@ midwest2
 northeast2 = layer2+coord_sf(xlim=northeastx,ylim=northeasty)
 northeast2
 ```
+
 ```{r}
 Confidencehistobase = ggplot(data=dataset, aes(x=fct_reorder(REGION,Confidence), y=Confidence))
-Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic() + theme(axis.title.x = element_blank())
+Confidencehisto = Confidencehistobase + geom_boxplot()+theme_classic() + theme(axis.title.x = element_blank()) + labs(title = "Confidence By Region") 
+Confidencehisto = Confidencehisto + theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 Confidencehisto
 ```
 
